@@ -1,8 +1,11 @@
 from config import app, db
 from auth import auth
+from playlist import playlist
+
 
 
 app.register_blueprint(auth)
+app.register_blueprint(playlist)
 
 
 if __name__ == "__main__":
