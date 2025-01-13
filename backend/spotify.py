@@ -1,9 +1,12 @@
 from flask import Blueprint, redirect, session, request, jsonify
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
+from spotipy import Spotify
+from dotenv import load_dotenv
 import os
 from time import time
 
 spotify = Blueprint('spotify', __name__)
+load_dotenv()
 
 
 scope = "playlist-modify-public playlist-modify-private"
@@ -15,6 +18,12 @@ sp_oauth = SpotifyOAuth(
     redirect_uri=os.getenv('SPOTIFY_REDIRECT_URI'),
     scope=scope
 )
+
+auth_manager = SpotifyClientCredentials(
+    client_id=os.getenv('SPOTIFY_CLIENT_ID'),
+    client_secret=os.getenv('SPOTIFY_CLIENT_SECRET')
+)
+sp = Spotify(auth_manager=auth_manager)
 
 @spotify.route('/')
 def login():

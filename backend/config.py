@@ -8,12 +8,13 @@ from dotenv import load_dotenv
 import os
 
 
+
 app = Flask(__name__)
 CORS(app)
 bcrypt = Bcrypt()
 jwt = JWTManager(app)
 
-load_dotenv()
+load_dotenv()#loads .env
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 

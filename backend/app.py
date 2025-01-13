@@ -3,7 +3,6 @@ from auth import auth
 from playlist import playlist
 from spotify import spotify
 
-app.secret_key = os.getenv()
 
 app.register_blueprint(auth)
 app.register_blueprint(playlist)

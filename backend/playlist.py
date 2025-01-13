@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import Playlist,PlaylistSong,User,Song
 from config import db
 from spotify import get_spotify_token
+from moodanalysis import mood_analysis
 import logging
 
 playlist = Blueprint('playlist', __name__)
@@ -41,4 +42,10 @@ def delete_playlist(id):
 
 @playlist.get('/generate')
 def generate_playlist():
-    pass
+    mood = request.json.get('text','')
+    if not mood:
+        return jsonify({"error": "No text provided"}), 400
+    mood_analysis(mood)
+    
+
+    
