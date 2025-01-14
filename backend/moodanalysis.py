@@ -1,5 +1,5 @@
 from transformers import pipeline
-from spotify import sp
+from spotify import get_user_spotify
 import spacy
 
 sentiment_pipeline = pipeline("sentiment-analysis", framework="tf",
@@ -24,11 +24,46 @@ moods = {
     }
 }
 
+mood_to_music = {
+    "excited": {
+        "seed_genres": ["pop", "dance"],
+        "audio_features": {"min_energy": 0.7, "min_valence": 0.6}
+    },
+    "relaxed": {
+        "seed_genres": ["chill", "acoustic"],
+        "audio_features": {"max_energy": 0.5, "max_danceability": 0.4}
+    },
+    "angry": {
+        "seed_genres": ["rock", "metal"],
+        "audio_features": {"min_energy": 0.8}
+    },
+    "lonely": {
+        "seed_genres": ["sad"],
+        "audio_features": {"max_valence": 0.3, "max_energy": 0.4}
+    },
+    "tired": {
+        "seed_genres": ["relaxing", "ambient"],
+        "audio_features": {"max_energy": 0.4, "tempo": {"max": 90}}
+    },
+    "sad": {
+        "seed_genres": ["melancholy", "piano"],
+        "audio_features": {"max_valence": 0.4, "max_energy": 0.3}
+    },
+    "fearful": {
+        "seed_genres": ["calming", "ambient"],
+        "audio_features": {"max_energy": 0.5, "min_valence": 0.2}
+    },
+    "calm": {
+        "seed_genres": ["ambient", "classical"],
+        "audio_features": {"max_energy": 0.4, "min_valence": 0.4}
+    },
+    "focused": {
+        "seed_genres": ["instrumental", "study"],
+        "audio_features": {"min_energy": 0.4, "min_instrumentalness": 0.5}
+    }
+}
 
 
-def fetch_songs():
-    results = sp.search(q="", type="track", limit=50)
-    tracks = results["tracks"]["items"]
 
 
 def mood_analysis(text):
@@ -49,7 +84,6 @@ def mood_analysis(text):
             similarity = input_doc.similarity(keyword_doc)
             if similarity > best_similarity:
                 best_mood = refined_mood
-                print(similarity)
                 best_similarity = similarity
 
     return {
@@ -58,11 +92,32 @@ def mood_analysis(text):
     }
 
 
-print(mood_analysis("Im gonna crashout"))
 
 
-def create_playlist():
-    pass
+def create_playlist(results):
+    mood = results.get('mood')
+    query = mood_to_music[mood]
+    seed_genres = query.get("seed_genres", ["pop"])
+    audio_features = query.get("audio_features", {})
+    print(seed_genres)
+    print(audio_features)
+
+    try:
+        # Use user-specific Spotify instance
+        user_sp = get_user_spotify()
+        recommendations = user_sp.recommendations(
+            seed_genres=seed_genres,
+            limit=10,
+            **audio_features
+        )
+        return recommendations["tracks"]
+    except Exception as e:
+        print(f"Error fetching recommendations: {e}")
+        return []
+
+    
+    
+
 
 
 

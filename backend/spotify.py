@@ -25,7 +25,7 @@ auth_manager = SpotifyClientCredentials(
 )
 sp = Spotify(auth_manager=auth_manager)
 
-@spotify.route('/')
+@spotify.route('/login')
 def login():
     return redirect(sp_oauth.get_authorize_url())
 
@@ -37,7 +37,7 @@ def callback():
         return jsonify({"error": "Authorization code not provided"}), 400
     token_info = sp_oauth.get_access_token(code)
     session['token_info'] = token_info
-    return redirect('http://localhost:5173/')  
+    return redirect(os.getenv('SPOTIFY_REDIRECT_URI'))  
 
 def get_spotify_token():
     token_info = session.get('token_info')
@@ -49,3 +49,8 @@ def get_spotify_token():
         session['token_info'] = token_info
 
     return token_info
+def get_user_spotify():
+    token_info = get_spotify_token()
+    if not token_info:
+        raise Exception("User token not available or expired")
+    return Spotify(auth=token_info['access_token'])

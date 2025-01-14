@@ -2,6 +2,10 @@ from config import app, db
 from auth import auth
 from playlist import playlist
 from spotify import spotify
+import os
+
+
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 
 app.register_blueprint(auth)

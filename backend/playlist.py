@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import Playlist,PlaylistSong,User,Song
 from config import db
 from spotify import get_spotify_token
-from moodanalysis import mood_analysis
+from moodanalysis import mood_analysis, create_playlist
 import logging
 
 playlist = Blueprint('playlist', __name__)
@@ -45,7 +45,8 @@ def generate_playlist():
     mood = request.json.get('text','')
     if not mood:
         return jsonify({"error": "No text provided"}), 400
-    mood_analysis(mood)
-    
+    results = mood_analysis(mood)
+    return jsonify({"mood": results}),200
+    #print(create_playlist(results))
 
     
