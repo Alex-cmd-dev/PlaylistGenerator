@@ -94,23 +94,70 @@ def mood_analysis(text):
 
 
 
-def create_playlist():
-    pass
+def create_playlist(results):
+    songs = fetch_songs(results)
+
+
+
+    
 
 
 def fetch_songs(results):
     mood = results.get('mood')
     query = mood_to_music.get(mood)
+    print(query)
 
     search_query = "genre:" + " ".join(query.get("seed_genres", ["pop"]))
 
     try:
         user_sp = get_user_spotify()
-        search_results = user_sp.search(q=search_query, type="track", limit=50)
-        return search_results["tracks"]["items"]  # Returns raw tracks for filtering
+        search_results = user_sp.search(q=search_query, type="track", limit=75)
+        tracks = extract_tracks_data(search_results)
+        filtered_tracks = filter_tracks(tracks, query)
+
+        return filtered_tracks
     except Exception as e:
         print(f"Error searching tracks: {e}")
         return []
+    
+
+def extract_tracks_data(fetched_songs):
+    extracted_tracks = []
+    for track in fetched_songs["tracks"]["items"]:
+        track_data = {
+            "id": track["id"],
+            "name": track["name"],
+            "artist": track["artists"][0]["name"], 
+            "album": track["album"]["name"],
+        }
+        extracted_tracks.append(track_data)
+    return extracted_tracks
+
+
+def audio_features(tracks_id):
+    try:
+        user_sp = get_user_spotify()  
+        features = user_sp.audio_features(tracks_id)
+        return features
+    except Exception as e:
+        print(f"Error fetching audio features: {e}")
+        return []
+
+def filter_tracks(tracks,mood_features):
+    song_ids = [track["id"] for track in tracks]
+    songfeatures = audio_features(song_ids)
+    audio_features = mood_features.get(audio_features)
+    filtered_tracks = []
+
+    
+
+    return filtered_tracks
+    
+
+
+
+
+
     
 
 
