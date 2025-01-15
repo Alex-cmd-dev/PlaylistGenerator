@@ -34,10 +34,19 @@ def login():
 def callback():
     code = request.args.get('code')
     if not code:
+        print("Authorization code not provided.")
         return jsonify({"error": "Authorization code not provided"}), 400
-    token_info = sp_oauth.get_access_token(code)
-    session['token_info'] = token_info
-    return redirect(os.getenv('SPOTIFY_REDIRECT_URI'))  
+    try:
+        # Exchange the authorization code for an access token
+        token_info = sp_oauth.get_access_token(code)
+        # Store token info in the session
+        session['token_info'] = token_info
+
+        return redirect('/generate')#dont forget to change this 
+    except Exception as e:
+        return jsonify({"error": "Token exchange failed"}), 500
+   
+
 
 def get_spotify_token():
     token_info = session.get('token_info')

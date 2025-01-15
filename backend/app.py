@@ -2,10 +2,11 @@ from config import app, db
 from auth import auth
 from playlist import playlist
 from spotify import spotify
+from dotenv import load_dotenv
 import os
 
 
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
 
 app.register_blueprint(auth)

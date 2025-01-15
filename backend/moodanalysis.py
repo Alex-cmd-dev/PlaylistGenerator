@@ -94,29 +94,28 @@ def mood_analysis(text):
 
 
 
-def create_playlist(results):
+def create_playlist():
+    pass
+
+
+def fetch_songs(results):
     mood = results.get('mood')
-    query = mood_to_music[mood]
-    seed_genres = query.get("seed_genres", ["pop"])
-    audio_features = query.get("audio_features", {})
-    print(seed_genres)
-    print(audio_features)
+    query = mood_to_music.get(mood)
+
+    search_query = "genre:" + " ".join(query.get("seed_genres", ["pop"]))
 
     try:
-        # Use user-specific Spotify instance
         user_sp = get_user_spotify()
-        recommendations = user_sp.recommendations(
-            seed_genres=seed_genres,
-            limit=10,
-            **audio_features
-        )
-        return recommendations["tracks"]
+        search_results = user_sp.search(q=search_query, type="track", limit=50)
+        return search_results["tracks"]["items"]  # Returns raw tracks for filtering
     except Exception as e:
-        print(f"Error fetching recommendations: {e}")
+        print(f"Error searching tracks: {e}")
         return []
+    
 
-    
-    
+
+
+
 
 
 
